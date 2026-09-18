@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 INA237_Handle_TypeDef_t FLT_DETECT;
+#include <string.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,7 +96,14 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  FLT_DETECT.hi2c = &hi2c1;
+  FLT_DETECT.Init.dev_i2c_addr = (0x40<<1);
+  FLT_DETECT.FAULT_Port = GPIOC;
+  FLT_DETECT.FAULT_Pin = GPIO_PIN_5;
+//  FLT_DETECT.Init.op_mode = INA237_OP_MODE_SH_BUS_TEMP_CONT;
+  char c[50];
+  float ff;
+  uint32_t len;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -104,6 +113,29 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13))
+	  {
+		  HAL_Delay(150);
+		  INA237_Get_Bus_Vltg_V(&FLT_DETECT,&ff);
+		  len = sprintf(c,"Bus Voltage: %f\r",ff);
+		  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+
+		  INA237_Get_Shunt_Vltg_V(&FLT_DETECT, &ff);
+		  len = sprintf(c,"Shunt Voltage: %f\r",ff);
+		  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+
+		  INA237_Get_Current_A(&FLT_DETECT, &ff);
+		  len = sprintf(c,"Current: %f\r",ff);
+		  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+
+		  INA237_Get_Power_W(&FLT_DETECT, &ff);
+		  len = sprintf(c,"Power: %f\r",ff);
+		  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+
+		  INA237_Get_Temp_C(&FLT_DETECT, &ff);
+		  len = sprintf(c,"Temp: %f\r\n",ff);
+		  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+	  }
   }
   /* USER CODE END 3 */
 }
@@ -291,6 +323,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PC5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

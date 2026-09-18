@@ -93,7 +93,6 @@ typedef enum
 #define INA237_ADCRANGE_163_84_MV 0x00U
 #define INA237_ADCRANGE_40_96_MV 0x01U
 
-#define __INA237_CONVDLY_MAX          0xFFU
 
 // @avg
 #define INA237_AVG_1                0x00U
@@ -154,6 +153,14 @@ typedef enum
 #define INA237_OP_MODE_SH_TEMP_CONT       0x0EU
 #define INA237_OP_MODE_SH_BUS_TEMP_CONT   0x0FU
 
+#define __INA237_CURRENT_LSB_DIVISOR     32768.0f
+
+#define __INA237_SHUNTVLTG_LSB_ADC_1     1.25e-6f
+#define __INA237_SHUNTVLTG_LSB_ADC_0     5e-6f
+#define __INA237_BUSVLTG_LSB             3.125e-3f
+#define __INA237_TEMP_LSB                125e-3f
+#define __INA237_CONVDLY_MAX          0xFFU
+
 #define __INA237_ADCRANGE_POS 0x05U
 #define __INA237_CONVDLY_POS  0x06U
 #define __INA237_RST_POS      0x0FU
@@ -166,6 +173,8 @@ typedef enum
 
 #define __INA237_TOL_POS       0x04U
 #define __INA237_DIETEMP_POS   0x04U
+
+#define __INA237_ADCRANGE_BIT_POS_MASK (1<<__INA237_ADCRANGE_POS)
 
 #define __INA237_DIAG_ALRT_ALATCH_POS       0x0FU
 #define __INA237_DIAG_ALRT_CNVR_POS         0x0EU
@@ -186,7 +195,7 @@ typedef enum
 
 HAL_StatusTypeDef INA237_Init(INA237_Handle_TypeDef_t *hfault);
 HAL_StatusTypeDef INA237_Reset(INA237_Handle_TypeDef_t *hfault);
-HAL_StatusTypeDef INA237_ReadReg(INA237_Handle_TypeDef_t *hfault,INA237_Register_t reg,uint8_t *pData);
+HAL_StatusTypeDef INA237_ReadReg(INA237_Handle_TypeDef_t *hfault,INA237_Register_t reg,uint16_t *pData);
 HAL_StatusTypeDef INA237_Get_Shunt_Vltg_V(INA237_Handle_TypeDef_t *hfault,float *pData);
 HAL_StatusTypeDef INA237_Get_Bus_Vltg_V(INA237_Handle_TypeDef_t *hfault,float *pData);
 HAL_StatusTypeDef INA237_Get_Temp_C(INA237_Handle_TypeDef_t *hfault,float *pData);
