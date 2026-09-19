@@ -46,12 +46,12 @@ typedef struct
 	float max_cur_exp_A;
 	float shunt_res_Ohm;
 
-	INA237_Register_t reg;
-
 } INA237_InitTypeDef_t;
 typedef struct
 {
 	I2C_HandleTypeDef *hi2c;
+
+	INA237_Register_t reg;
 
 	GPIO_TypeDef *FAULT_Port;
 	uint16_t FAULT_Pin;
@@ -154,16 +154,19 @@ typedef enum
 #define INA237_OP_MODE_SH_BUS_TEMP_CONT   0x0FU
 
 #define __INA237_CURRENT_LSB_DIVISOR     32768.0f
-
-#define __INA237_SHUNTVLTG_LSB_ADC_1     1.25e-6f
+#define __INA237_CALIB_DIVIDEND_ADC0     (819.2f * 1000000)
+#define __INA237_CALIB_DIVIDEND_ADC1     (4*819.2f * 1000000)
 #define __INA237_SHUNTVLTG_LSB_ADC_0     5e-6f
+#define __INA237_SHUNTVLTG_LSB_ADC_1     1.25e-6f
 #define __INA237_BUSVLTG_LSB             3.125e-3f
 #define __INA237_TEMP_LSB                125e-3f
-#define __INA237_CONVDLY_MAX          0xFFU
+#define __INA237_POWER_LSB_MULTIPLIER    0.2f
 
-#define __INA237_ADCRANGE_POS 0x05U
-#define __INA237_CONVDLY_POS  0x06U
-#define __INA237_RST_POS      0x0FU
+#define __INA237_CONVDLY_MAX             0xFFU
+
+#define __INA237_ADCRANGE_POS  0x05U
+#define __INA237_CONVDLY_POS   0x06U
+#define __INA237_RST_POS       0x0FU
 
 #define __INA237_AVG_POS       0x00U
 #define __INA237_VTCT_POS      0x03U
@@ -174,7 +177,8 @@ typedef enum
 #define __INA237_TOL_POS       0x04U
 #define __INA237_DIETEMP_POS   0x04U
 
-#define __INA237_ADCRANGE_BIT_POS_MASK (1<<__INA237_ADCRANGE_POS)
+#define __INA237_DIETEMP_SHIFT 0x04U
+#define __INA237_ADCRANGE_BIT_MASK (1<<__INA237_ADCRANGE_POS)
 
 #define __INA237_DIAG_ALRT_ALATCH_POS       0x0FU
 #define __INA237_DIAG_ALRT_CNVR_POS         0x0EU

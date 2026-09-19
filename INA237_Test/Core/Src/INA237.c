@@ -7,8 +7,8 @@
 #include "INA237.h"
 
 static HAL_StatusTypeDef INA237_WriteReg(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,uint16_t Data);
-static HAL_StatusTypeDef __INA237_ReadReg_24(INA237_Handle_TypeDef_t *hfault,INA237_Register_t reg,uint32_t *pData);
-static HAL_StatusTypeDef __INA237_ReadReg_Signed(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,int16_t *pData);
+static HAL_StatusTypeDef INA237_ReadReg_24(INA237_Handle_TypeDef_t *hfault,INA237_Register_t reg,uint32_t *pData);
+static HAL_StatusTypeDef INA237_ReadReg_Signed(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,int16_t *pData);
 /**
  * @brief  Resets the INA237 device.
  * @details Sets the reset bit in the INA237 CONFIG register, causing the
@@ -121,7 +121,7 @@ HAL_StatusTypeDef INA237_ReadReg(INA237_Handle_TypeDef_t *hfault,INA237_Register
 
 	return status;
 }
-static HAL_StatusTypeDef __INA237_ReadReg_Signed(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,int16_t *pData)
+static HAL_StatusTypeDef INA237_ReadReg_Signed(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,int16_t *pData)
 {
 	HAL_StatusTypeDef status;
 	uint8_t rx_buff[2];
@@ -131,11 +131,11 @@ static HAL_StatusTypeDef __INA237_ReadReg_Signed(INA237_Handle_TypeDef_t *hfault
 	{
 		return status;
 	}
-	*pData = (((int16_t)rx_buff[0]<<8) |(int16_t)rx_buff[1]);
+	*pData = (((int16_t)rx_buff[0]<<8) | (int16_t)rx_buff[1]);
 
 	return status;
 }
-static HAL_StatusTypeDef __INA237_ReadReg_24(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,uint32_t *pData)
+static HAL_StatusTypeDef INA237_ReadReg_24(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,uint32_t *pData)
 {
 	if(hfault == NULL ||hfault->hi2c == NULL || hfault->Init.dev_i2c_addr == 0 || pData == NULL)
 	{
@@ -171,19 +171,19 @@ HAL_StatusTypeDef INA237_Set_Calib(INA237_Handle_TypeDef_t *hfault)
 	{
 		return status;
 	}
-	if(reg & __INA237_ADCRANGE_BIT_POS_MASK)
+	if(reg & __INA237_ADCRANGE_BIT_MASK)
 	{
-		cal_f = (float)((4*819.2f * 1000000) / ((hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR) * hfault->Init.shunt_res_Ohm));
+		cal_f = (float)(__INA237_CALIB_DIVIDEND_ADC1 / ((hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR) * hfault->Init.shunt_res_Ohm));
 	}
 	else
 	{
-		cal_f = (float)((819.2f * 1000000) / ((hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR) * hfault->Init.shunt_res_Ohm));
+		cal_f = (float)(__INA237_CALIB_DIVIDEND_ADC0 / ((hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR) * hfault->Init.shunt_res_Ohm));
 	}
 	if ((cal_f < 1.0f) || (cal_f > 32767.0f))
 	{
 		return HAL_ERROR;
 	}
-	uint16_t cal = (uint16_t)((cal_f + 0.5f)>>1);
+	uint16_t cal = ((uint16_t)(cal_f + 0.5f)>>1);
 
 	status = INA237_WriteReg(hfault,INA237_REG_SHUNT_CAL,cal);
 	if(status != HAL_OK)
@@ -192,7 +192,7 @@ HAL_StatusTypeDef INA237_Set_Calib(INA237_Handle_TypeDef_t *hfault)
 	}
 
 	hfault->_current_lsb = hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR;
-	hfault->_power_lsb = 0.2f * (hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR);
+	hfault->_power_lsb = __INA237_POWER_LSB_MULTIPLIER * (hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR);
 
 	return status;
 }
@@ -211,12 +211,12 @@ HAL_StatusTypeDef INA237_Get_Shunt_Vltg_V(INA237_Handle_TypeDef_t *hfault,float 
 	{
 		return status;
 	}
-	status =  __INA237_ReadReg_Signed(hfault,INA237_REG_SHUNT_VLTG,&shnt_vlt_raw);
+	status =  INA237_ReadReg_Signed(hfault,INA237_REG_SHUNT_VLTG,&shnt_vlt_raw);
 	if(status != HAL_OK)
 	{
 		return status;
 	}
-	if(reg & __INA237_ADCRANGE_BIT_POS_MASK)
+	if(reg & __INA237_ADCRANGE_BIT_MASK)
 	{
 		*pData = (float)(shnt_vlt_raw * __INA237_SHUNTVLTG_LSB_ADC_1);
 	}
@@ -235,7 +235,7 @@ HAL_StatusTypeDef INA237_Get_Bus_Vltg_V(INA237_Handle_TypeDef_t *hfault,float *p
 	}
 	int16_t bus_vlt_raw;
 	HAL_StatusTypeDef status;
-	status = __INA237_ReadReg_Signed(hfault,INA237_REG_BUS_VLTG,&bus_vlt_raw);
+	status = INA237_ReadReg_Signed(hfault,INA237_REG_BUS_VLTG,&bus_vlt_raw);
 	if(status != HAL_OK)
 	{
 		return status;
@@ -254,13 +254,13 @@ HAL_StatusTypeDef INA237_Get_Temp_C(INA237_Handle_TypeDef_t *hfault,float *pData
 	}
 	int16_t die_temp_raw;
 	HAL_StatusTypeDef status;
-	status = __INA237_ReadReg_Signed(hfault,INA237_REG_DIETEMP,&die_temp_raw);
+	status = INA237_ReadReg_Signed(hfault,INA237_REG_DIETEMP,&die_temp_raw);
 	if(status != HAL_OK)
 	{
 		return status;
 	}
 
-	*pData = (float)((die_temp_raw>>4) * __INA237_TEMP_LSB);
+	*pData = (float)((die_temp_raw>>__INA237_DIETEMP_SHIFT) * __INA237_TEMP_LSB);
 
 	return status;
 }
@@ -273,7 +273,7 @@ HAL_StatusTypeDef INA237_Get_Current_A(INA237_Handle_TypeDef_t *hfault,float *pD
 	}
 	int16_t cur_raw;
 	HAL_StatusTypeDef status;
-	status = __INA237_ReadReg_Signed(hfault,INA237_REG_CURRENT,&cur_raw);
+	status = INA237_ReadReg_Signed(hfault,INA237_REG_CURRENT,&cur_raw);
 	if(status != HAL_OK)
 	{
 		return status;
@@ -292,7 +292,7 @@ HAL_StatusTypeDef INA237_Get_Power_W(INA237_Handle_TypeDef_t *hfault,float *pDat
 	}
 	uint32_t power_raw;
 	HAL_StatusTypeDef status;
-	status = __INA237_ReadReg_24(hfault,INA237_REG_POWER,&power_raw);
+	status = INA237_ReadReg_24(hfault,INA237_REG_POWER,&power_raw);
 	if(status != HAL_OK)
 	{
 		return status;
