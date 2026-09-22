@@ -578,6 +578,7 @@ HAL_StatusTypeDef INA237_Set_Alert_Val(INA237_Handle_TypeDef_t *hfault,INA237_Re
 		return INA237_WriteReg(hfault, INA237_REG_TEMP_LIMIT, tx);
 		break;
 	case INA237_REG_PWR_LIMIT:
+		Val = Val * __INA237_POWER_LIMIT_MULTIPLIER;
 		return INA237_WriteReg(hfault, INA237_REG_PWR_LIMIT, Val);
 		break;
 	default:

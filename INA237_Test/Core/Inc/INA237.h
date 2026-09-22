@@ -158,6 +158,7 @@ typedef enum
 #define __INA237_BUSVLTG_LSB             3.125e-3f
 #define __INA237_TEMP_LSB                125e-3f
 #define __INA237_POWER_LSB_MULTIPLIER    0.2f
+#define __INA237_POWER_LIMIT_MULTIPLIER  0x100U
 
 #define __INA237_CONVDLY_MAX             0xFFU
 

@@ -112,7 +112,7 @@ int main(void)
   FLT_DETECT.Init.max_cur_exp_A = 0.5;
   FLT_DETECT.Init.shunt_res_Ohm = 0.1;
   INA237_Set_Calib(&FLT_DETECT);
-  INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_CNVR, ENABLE);
+  INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_SLOWALERT, ENABLE);
   char c[50];
   float ff;
   uint32_t len;
