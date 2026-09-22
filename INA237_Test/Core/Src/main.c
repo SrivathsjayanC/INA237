@@ -100,10 +100,23 @@ int main(void)
   FLT_DETECT.Init.dev_i2c_addr = (0x40<<1);
   FLT_DETECT.FAULT_Port = GPIOC;
   FLT_DETECT.FAULT_Pin = GPIO_PIN_5;
-//  FLT_DETECT.Init.op_mode = INA237_OP_MODE_SH_BUS_TEMP_CONT;
+
+  FLT_DETECT.Init.op_mode = INA237_OP_MODE_SH_BUS_TEMP_CONT;
+  FLT_DETECT.Init.adc_range = INA237_ADCRANGE_163_84_MV;
+  FLT_DETECT.Init.avg = INA237_AVG_256;
+  FLT_DETECT.Init.conv_dly = 0x00U;
+  FLT_DETECT.Init.vbusct = INA237_VBUSCT_540US;
+  FLT_DETECT.Init.vshct = INA237_VSHCT_540US;
+  FLT_DETECT.Init.vtct = INA237_VTCT_540US;
+  INA237_Init(&FLT_DETECT);
+  FLT_DETECT.Init.max_cur_exp_A = 0.5;
+  FLT_DETECT.Init.shunt_res_Ohm = 0.1;
+  INA237_Set_Calib(&FLT_DETECT);
+  INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_CNVR, ENABLE);
   char c[50];
   float ff;
   uint32_t len;
+  uint8_t flag;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -135,6 +148,17 @@ int main(void)
 		  INA237_Get_Temp_C(&FLT_DETECT, &ff);
 		  len = sprintf(c,"Temp: %f\r\n",ff);
 		  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+		  flag = INA237_Get_Diag_Alert_Flag(&FLT_DETECT, INA237_DIAG_ALRT_CNVRF);
+		  if(flag)
+		  {
+			  len = sprintf(c,"Conversion Is Complete\r\n");
+			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+		  }
+		  else
+		  {
+			  len = sprintf(c,"False\r\n");
+			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+		  }
 	  }
   }
   /* USER CODE END 3 */

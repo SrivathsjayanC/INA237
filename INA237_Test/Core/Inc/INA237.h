@@ -1,8 +1,7 @@
 /*
- * INA237.h
- *
- *  Created on: Sep 4, 2026
- *      Author: SRIVATHSJAYAN
+ * 	@file INA237.h
+ *  @date 04 Sep 2026
+ *  @author: SRIVATHSJAYAN
  */
 
 #ifndef INC_INA237_H_
@@ -88,6 +87,23 @@ typedef enum
 	INA237_DIAG_ALRT_MEMSTAT     = 0x00U
 } INA237_Diag_Alert_t;
 
+// @op_mode
+#define INA237_OP_MODE_PWR_DWN_0          0x00U
+#define INA237_OP_MODE_BUS_VT_TRG         0x01U
+#define INA237_OP_MODE_SH_VT_TRG          0x02U
+#define INA237_OP_MODE_SH_BUS_VT_TRG      0x03U
+#define INA237_OP_MODE_TEMP_TRG           0x04U
+#define INA237_OP_MODE_BUS_TEMP_TRG       0x05U
+#define INA237_OP_MODE_SH_TEMP_TRG        0x06U
+#define INA237_OP_MODE_SH_BUS_TEMP_TRG    0x07U
+#define INA237_OP_MODE_PWR_DWN_8          0x08U
+#define INA237_OP_MODE_BUS_VT_CONT        0x09U
+#define INA237_OP_MODE_SH_VT_CONT         0x0AU
+#define INA237_OP_MODE_SH_BUS_VT_CONT     0x0BU
+#define INA237_OP_MODE_TEMP_CONT          0x0CU
+#define INA237_OP_MODE_BUS_TEMP_CONT      0x0DU
+#define INA237_OP_MODE_SH_TEMP_CONT       0x0EU
+#define INA237_OP_MODE_SH_BUS_TEMP_CONT   0x0FU
 
 //@adc_range
 #define INA237_ADCRANGE_163_84_MV 0x00U
@@ -133,25 +149,6 @@ typedef enum
 #define INA237_VTCT_1052US         0x05U
 #define INA237_VTCT_2074US         0x06U
 #define INA237_VTCT_4120US         0x07U
-
-//@op_mode
-// @op_mode
-#define INA237_OP_MODE_PWR_DWN_0          0x00U
-#define INA237_OP_MODE_BUS_VT_TRG         0x01U
-#define INA237_OP_MODE_SH_VT_TRG          0x02U
-#define INA237_OP_MODE_SH_BUS_VT_TRG      0x03U
-#define INA237_OP_MODE_TEMP_TRG           0x04U
-#define INA237_OP_MODE_BUS_TEMP_TRG       0x05U
-#define INA237_OP_MODE_SH_TEMP_TRG        0x06U
-#define INA237_OP_MODE_SH_BUS_TEMP_TRG    0x07U
-#define INA237_OP_MODE_PWR_DWN_8          0x08U
-#define INA237_OP_MODE_BUS_VT_CONT        0x09U
-#define INA237_OP_MODE_SH_VT_CONT         0x0AU
-#define INA237_OP_MODE_SH_BUS_VT_CONT     0x0BU
-#define INA237_OP_MODE_TEMP_CONT          0x0CU
-#define INA237_OP_MODE_BUS_TEMP_CONT      0x0DU
-#define INA237_OP_MODE_SH_TEMP_CONT       0x0EU
-#define INA237_OP_MODE_SH_BUS_TEMP_CONT   0x0FU
 
 #define __INA237_CURRENT_LSB_DIVISOR     32768.0f
 #define __INA237_CALIB_DIVIDEND_ADC0     (819.2f * 1000000)

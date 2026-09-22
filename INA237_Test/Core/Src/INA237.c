@@ -1,8 +1,7 @@
 /*
- * INA237.c
- *
- *  Created on: Sep 4, 2026
- *      Author: SRIVATHSJAYAN
+ * 	@file INA237.c
+ *  @date 04 Sep 2026
+ *  @author: SRIVATHSJAYAN
  */
 #include "INA237.h"
 
@@ -124,14 +123,14 @@ HAL_StatusTypeDef INA237_ReadReg(INA237_Handle_TypeDef_t *hfault,INA237_Register
 static HAL_StatusTypeDef INA237_ReadReg_Signed(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,int16_t *pData)
 {
 	HAL_StatusTypeDef status;
-	uint8_t rx_buff[2];
+	uint8_t rx[2];
 
-	status = HAL_I2C_Mem_Read(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1, rx_buff, 2,HAL_MAX_DELAY);
+	status = HAL_I2C_Mem_Read(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1, rx, 2,HAL_MAX_DELAY);
 	if(status!=HAL_OK)
 	{
 		return status;
 	}
-	*pData = (((int16_t)rx_buff[0]<<8) | (int16_t)rx_buff[1]);
+	*pData = (((int16_t)rx[0]<<8) | (int16_t)rx[1]);
 
 	return status;
 }
@@ -206,7 +205,7 @@ HAL_StatusTypeDef INA237_Get_Shunt_Vltg_V(INA237_Handle_TypeDef_t *hfault,float 
 	uint16_t reg;
 	int16_t shnt_vlt_raw;
 	HAL_StatusTypeDef status;
-	status =  INA237_ReadReg(hfault,INA237_REG_ADC_CONFIG,&reg);
+	status =  INA237_ReadReg(hfault,INA237_REG_CONFIG,&reg);
 	if(status != HAL_OK)
 	{
 		return status;
@@ -407,5 +406,5 @@ uint8_t INA237_Get_Diag_Alert_Flag(INA237_Handle_TypeDef_t *hfault,INA237_Diag_A
 	{
 		return 0x99U;
 	}
-	return ((diag_alert & (1U << Ina237_Diag_Alrt)) == 1U);
+	return ((diag_alert & (1U << Ina237_Diag_Alrt)));
 }
