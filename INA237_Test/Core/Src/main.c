@@ -103,11 +103,11 @@ int main(void)
 
   FLT_DETECT.Init.op_mode = INA237_OP_MODE_SH_BUS_TEMP_CONT;
   FLT_DETECT.Init.adc_range = INA237_ADCRANGE_163_84_MV;
-  FLT_DETECT.Init.avg = INA237_AVG_256;
+  FLT_DETECT.Init.avg = INA237_AVG_64;
   FLT_DETECT.Init.conv_dly = 0x00U;
-  FLT_DETECT.Init.vbusct = INA237_VBUSCT_540US;
-  FLT_DETECT.Init.vshct = INA237_VSHCT_540US;
-  FLT_DETECT.Init.vtct = INA237_VTCT_540US;
+  FLT_DETECT.Init.vbusct = INA237_VBUSCT_1052US;
+  FLT_DETECT.Init.vshct = INA237_VSHCT_1052US;
+  FLT_DETECT.Init.vtct = INA237_VTCT_1052US;
   INA237_Init(&FLT_DETECT);
   FLT_DETECT.Init.max_cur_exp_A = 0.5;
   FLT_DETECT.Init.shunt_res_Ohm = 0.1;
