@@ -24,7 +24,7 @@ static HAL_StatusTypeDef INA237_ReadReg_Signed(INA237_Handle_TypeDef_t *hfault,I
  */
 HAL_StatusTypeDef INA237_Reset(INA237_Handle_TypeDef_t *hfault)
 {
-	uint16_t reset_bit = 0x01 << __INA237_RST_POS;
+	uint16_t reset_bit = 0x01U << __INA237_RST_POS;
 
 	return INA237_WriteReg(hfault, INA237_REG_CONFIG,reset_bit);
 }
@@ -57,10 +57,10 @@ HAL_StatusTypeDef INA237_Init(INA237_Handle_TypeDef_t *hfault)
 	{
 		return HAL_ERROR;
 	}
-	uint16_t reg=0;
+	uint16_t reg = 0;
 	HAL_StatusTypeDef status;
 	INA237_Reset(hfault);
-	HAL_Delay(5);
+	HAL_Delay(5U);
 	if(hfault->Init.adc_range > INA237_ADCRANGE_40_96_MV)
 	{
 		return HAL_ERROR;
@@ -137,10 +137,10 @@ HAL_StatusTypeDef INA237_Init(INA237_Handle_TypeDef_t *hfault)
 static HAL_StatusTypeDef INA237_WriteReg(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,uint16_t Data)
 {
 	uint8_t tx[2];
-	tx[0] = (uint8_t)(Data>>8);
+	tx[0] = (uint8_t)(Data>>8U);
 	tx[1] = (uint8_t)Data;
 
-	return HAL_I2C_Mem_Write(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1, tx, 2, HAL_MAX_DELAY);
+	return HAL_I2C_Mem_Write(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1U, tx, 2U, HAL_MAX_DELAY);
 }
 /**
  * @brief  Reads a 16-bit register from the INA237 over I2C.
@@ -175,12 +175,12 @@ HAL_StatusTypeDef INA237_ReadReg(INA237_Handle_TypeDef_t *hfault,INA237_Register
 	HAL_StatusTypeDef status;
 	uint8_t rx_buff[2];
 
-	status = HAL_I2C_Mem_Read(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1, rx_buff, 2,HAL_MAX_DELAY);
+	status = HAL_I2C_Mem_Read(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1U, rx_buff, 2U,HAL_MAX_DELAY);
 	if(status!=HAL_OK)
 	{
 		return status;
 	}
-	*pData = (((uint16_t)rx_buff[0]<<8) |(uint16_t)rx_buff[1]);
+	*pData = (((uint16_t)rx_buff[0]<<8U) |(uint16_t)rx_buff[1]);
 
 	return status;
 }
@@ -207,12 +207,12 @@ static HAL_StatusTypeDef INA237_ReadReg_Signed(INA237_Handle_TypeDef_t *hfault,I
 	HAL_StatusTypeDef status;
 	uint8_t rx[2];
 
-	status = HAL_I2C_Mem_Read(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1, rx, 2,HAL_MAX_DELAY);
+	status = HAL_I2C_Mem_Read(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1U, rx, 2U,HAL_MAX_DELAY);
 	if(status!=HAL_OK)
 	{
 		return status;
 	}
-	*pData = (((int16_t)rx[0]<<8) | (int16_t)rx[1]);
+	*pData = (int16_t)(((uint16_t)rx[0]<<8U) | (uint16_t)rx[1]);
 
 	return status;
 }
@@ -244,12 +244,12 @@ static HAL_StatusTypeDef INA237_ReadReg_24(INA237_Handle_TypeDef_t *hfault,INA23
 	HAL_StatusTypeDef status;
 	uint8_t rx[3];
 
-	status = HAL_I2C_Mem_Read(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1, rx, 3, HAL_MAX_DELAY);
+	status = HAL_I2C_Mem_Read(hfault->hi2c, hfault->Init.dev_i2c_addr, Reg, 1U, rx, 3U, HAL_MAX_DELAY);
 	if(status!=HAL_OK)
 	{
 		return status;
 	}
-	*pData = ((uint32_t)rx[2]<<16|(uint32_t)rx[1]<<8|(uint32_t)rx[0]);
+	*pData = ((uint32_t)rx[2]<<16U|(uint32_t)rx[1]<<8U|(uint32_t)rx[0]);
 	return status;
 }
 /**
@@ -302,7 +302,7 @@ HAL_StatusTypeDef INA237_Set_Calib(INA237_Handle_TypeDef_t *hfault)
 	{
 		return HAL_ERROR;
 	}
-	uint16_t cal = ((uint16_t)(cal_f + 0.5f)>>1);
+	uint16_t cal = ((uint16_t)(cal_f + 0.5f) >> __INA237_SHUNT_CAL_SHIFT);
 
 	status = INA237_WriteReg(hfault,INA237_REG_SHUNT_CAL,cal);
 	if(status != HAL_OK)
@@ -433,7 +433,7 @@ HAL_StatusTypeDef INA237_Get_Temp_C(INA237_Handle_TypeDef_t *hfault,float *pData
 		return status;
 	}
 
-	*pData = (float)((die_temp_raw>>__INA237_DIETEMP_SHIFT) * __INA237_TEMP_LSB);
+	*pData = (float)((die_temp_raw >> __INA237_DIETEMP_SHIFT) * __INA237_TEMP_LSB);
 
 	return status;
 }
