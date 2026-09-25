@@ -249,7 +249,7 @@ static HAL_StatusTypeDef INA237_ReadReg_24(INA237_Handle_TypeDef_t *hfault,INA23
 	{
 		return status;
 	}
-	*pData = ((uint32_t)rx[0]<<16U|(uint32_t)rx[1]<<8U|(uint32_t)rx[2]);
+	*pData = ((uint32_t)rx[2]<<16U|(uint32_t)rx[1]<<8U|(uint32_t)rx[0]);
 	return status;
 }
 /**
@@ -292,17 +292,17 @@ HAL_StatusTypeDef INA237_Set_Calib(INA237_Handle_TypeDef_t *hfault)
 	}
 	if(reg & __INA237_ADCRANGE_BIT_MASK)
 	{
-		cal_f = (float)(__INA237_CALIB_DIVIDEND_ADC1 * ((hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR) * hfault->Init.shunt_res_Ohm));
+		cal_f = (float)(__INA237_CALIB_DIVIDEND_ADC1 / ((hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR) * hfault->Init.shunt_res_Ohm));
 	}
 	else
 	{
-		cal_f = (float)(__INA237_CALIB_DIVIDEND_ADC0 * ((hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR) * hfault->Init.shunt_res_Ohm));
+		cal_f = (float)(__INA237_CALIB_DIVIDEND_ADC0 / ((hfault->Init.max_cur_exp_A / __INA237_CURRENT_LSB_DIVISOR) * hfault->Init.shunt_res_Ohm));
 	}
 	if ((cal_f < 1.0f) || (cal_f > 32767.0f))
 	{
 		return HAL_ERROR;
 	}
-	uint16_t cal = (uint16_t)(cal_f + 0.5f);
+	uint16_t cal = ((uint16_t)(cal_f + 0.5f) >> __INA237_SHUNT_CAL_SHIFT);
 
 	status = INA237_WriteReg(hfault,INA237_REG_SHUNT_CAL,cal);
 	if(status != HAL_OK)
@@ -533,7 +533,7 @@ HAL_StatusTypeDef INA237_Get_Power_W(INA237_Handle_TypeDef_t *hfault,float *pDat
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C write operation timed out.
  */
-HAL_StatusTypeDef INA237_Set_Alert_Limit_Val(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Ina237_Reg,uint16_t Val)
+HAL_StatusTypeDef INA237_Set_Alert_Val(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,uint16_t Val)
 {
 	if(hfault == NULL ||hfault->hi2c == NULL || hfault->Init.dev_i2c_addr == 0)
 	{

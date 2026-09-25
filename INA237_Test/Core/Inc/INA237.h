@@ -178,6 +178,7 @@ typedef enum
 #define __INA237_DIETEMP_SHIFT 0x04U
 #define __INA237_ADCRANGE_BIT_MASK (1<<__INA237_ADCRANGE_POS)
 
+#define __INA237_SHUNT_CAL_SHIFT 0x01U
 #define __INA237_DIAG_ALRT_ALATCH_POS       0x0FU
 #define __INA237_DIAG_ALRT_CNVR_POS         0x0EU
 #define __INA237_DIAG_ALRT_SLOWALERT_POS    0x0DU
@@ -204,7 +205,7 @@ HAL_StatusTypeDef INA237_Get_Temp_C(INA237_Handle_TypeDef_t *hfault,float *pData
 HAL_StatusTypeDef INA237_Set_Calib(INA237_Handle_TypeDef_t *hfault);
 HAL_StatusTypeDef INA237_Get_Power_W(INA237_Handle_TypeDef_t *hfault,float *pData);
 HAL_StatusTypeDef INA237_Get_Current_A(INA237_Handle_TypeDef_t *hfault,float *pData);
-HAL_StatusTypeDef INA237_Set_Alert_Limit_Val(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,uint16_t Val);
+HAL_StatusTypeDef INA237_Set_Alert_Val(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,uint16_t Val);
 HAL_StatusTypeDef INA237_Set_Diag_Alert_Config(INA237_Handle_TypeDef_t *hfault,INA237_Diag_Alert_Config_t _Ina237_Diag_Alrt,uint8_t En_Di);
 uint8_t INA237_Get_Diag_Alert_Flag(INA237_Handle_TypeDef_t *hfault,INA237_Diag_Alert_t Ina237_Diag_Alrt);
 #endif /* INC_INA237_H_ */
