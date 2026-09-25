@@ -59,6 +59,7 @@ typedef struct
 
 	float _current_lsb;
 	float _power_lsb;
+	uint16_t __reg_trigger;
 
 } INA237_Handle_TypeDef_t;
 
@@ -164,7 +165,7 @@ typedef enum
 
 #define __INA237_CONVDLY_MAX             0xFFU
 
-#define __INA237_ADCRANGE_POS  0x05U
+#define __INA237_ADCRANGE_POS  0x04U
 #define __INA237_CONVDLY_POS   0x06U
 #define __INA237_RST_POS       0x0FU
 
@@ -209,4 +210,5 @@ HAL_StatusTypeDef INA237_Get_Current_A(INA237_Handle_TypeDef_t *hfault,float *pD
 HAL_StatusTypeDef INA237_Set_Alert_Limit_Val(INA237_Handle_TypeDef_t *hfault,INA237_Register_t Reg,uint16_t Val);
 HAL_StatusTypeDef INA237_Set_Diag_Alert_Config(INA237_Handle_TypeDef_t *hfault,INA237_Diag_Alert_Config_t _Ina237_Diag_Alrt,uint8_t En_Di);
 uint8_t INA237_Get_Diag_Alert_Flag(INA237_Handle_TypeDef_t *hfault,INA237_Diag_Alert_t Ina237_Diag_Alrt);
+HAL_StatusTypeDef INA237_Trigger_Conv(INA237_Handle_TypeDef_t *hfault);
 #endif /* INC_INA237_H_ */

@@ -101,20 +101,20 @@ int main(void)
   FLT_DETECT.FAULT_Port = GPIOC;
   FLT_DETECT.FAULT_Pin = GPIO_PIN_5;
 
-  FLT_DETECT.Init.op_mode = INA237_OP_MODE_SH_BUS_TEMP_CONT;
-  FLT_DETECT.Init.adc_range = INA237_ADCRANGE_163_84_MV;
+  FLT_DETECT.Init.op_mode = INA237_OP_MODE_SH_BUS_TEMP_TRG;
+  FLT_DETECT.Init.adc_range = INA237_ADCRANGE_40_96_MV;
   FLT_DETECT.Init.avg = INA237_AVG_1024;
   FLT_DETECT.Init.conv_dly = 0x00U;
-  FLT_DETECT.Init.vbusct = INA237_VBUSCT_50US;
-  FLT_DETECT.Init.vshct = INA237_VSHCT_50US;
-  FLT_DETECT.Init.vtct = INA237_VTCT_50US;
+  FLT_DETECT.Init.vbusct = INA237_VBUSCT_1052US;
+  FLT_DETECT.Init.vshct = INA237_VSHCT_1052US;
+  FLT_DETECT.Init.vtct = INA237_VTCT_1052US;
   INA237_Init(&FLT_DETECT);
   FLT_DETECT.Init.max_cur_exp_A = 0.5;
   FLT_DETECT.Init.shunt_res_Ohm = 0.1;
   INA237_Set_Calib(&FLT_DETECT);
   INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_CNVR, ENABLE);
 //  INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_SLOWALERT, ENABLE);
-  INA237_Set_Alert_Limit_Val(&FLT_DETECT, INA237_REG_TEMP_LIMIT, 0x190);
+//  INA237_Set_Alert_Limit_Val(&FLT_DETECT, INA237_REG_TEMP_LIMIT, 0x190);
 //  INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_ALATCH, ENABLE);
   char c[50];
   float ff;
@@ -162,6 +162,7 @@ int main(void)
 			  len = sprintf(c,"False\r\n");
 			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
 		  }
+		  INA237_Trigger_Conv(&FLT_DETECT);
 	  }
   }
   /* USER CODE END 3 */
@@ -232,7 +233,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x10E1A6F2;
+  hi2c1.Init.Timing = 0x00C20F27;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -258,6 +259,10 @@ static void MX_I2C1_Init(void)
   {
     Error_Handler();
   }
+
+  /** I2C Fast mode Plus enable
+  */
+  HAL_I2CEx_EnableFastModePlus(I2C_FASTMODEPLUS_I2C1);
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */

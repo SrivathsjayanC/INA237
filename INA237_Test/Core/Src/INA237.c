@@ -29,27 +29,25 @@ HAL_StatusTypeDef INA237_Reset(INA237_Handle_TypeDef_t *hfault)
 	return INA237_WriteReg(hfault, INA237_REG_CONFIG,reset_bit);
 }
 /**
- * @brief  Initializes the INA237 power/current monitor over I2C.
+ * @brief  Initializes the INA237 power/current monitor over I2C and caches trigger configuration.
  * @details Validates the handle pointers, peripheral instance, device address, and
  *          initialization parameters. Issues a software reset to restore the device to its
  *          power-on defaults, waits 5 ms for internal reboot completion, and configures both
  *          the CONFIG (00h) and ADC_CONFIG (01h) registers with the requested ADC range,
- *          conversion delay, operating mode, conversion times, and averaging count.
+ *          conversion delay, operating mode, conversion times, and averaging count. Additionally,
+ *          caches the assembled ADC configuration register word into `__reg_trigger` within the
+ *          handle structure for subsequent one-shot trigger calls.
  *
- * @param[in] hfault Pointer to the INA237 handle structure containing device settings,
- *                   I2C peripheral instance, and initialization parameters.
+ * @param[in,out] hfault Pointer to the INA237 handle structure containing device settings,
+ *                       I2C peripheral instance, and initialization parameters. Acts as an
+ *                       input for configuration settings and an output for caching `__reg_trigger`.
  *
- * @retval HAL_OK       Device successfully reset and configured.
+ * @retval HAL_OK       Device successfully reset and configured, with trigger settings cached.
  * @retval HAL_ERROR    A pointer argument is NULL, the target device I2C address is 0,
  *                      an initialization parameter is out of valid range or set to an
  *                      unsupported power-down state, or an I2C communication error occurred.
  * @retval HAL_BUSY     The I2C peripheral is currently busy.
  * @retval HAL_TIMEOUT  The I2C communication timed out.
- *
- * @note   The device is reset before applying the configuration.
- * @note   The function configures the ADC range, conversion delay,
- *         operating mode, bus voltage conversion time, shunt voltage
- *         conversion time, temperature conversion time, and averaging.
  */
 HAL_StatusTypeDef INA237_Init(INA237_Handle_TypeDef_t *hfault)
 {
@@ -115,7 +113,7 @@ HAL_StatusTypeDef INA237_Init(INA237_Handle_TypeDef_t *hfault)
 		return HAL_ERROR;
 	}
 	reg |= hfault->Init.avg << __INA237_AVG_POS;
-
+	hfault->__reg_trigger = reg;
 	return INA237_WriteReg(hfault,INA237_REG_ADC_CONFIG,reg);
 }
 /**
@@ -675,4 +673,27 @@ uint8_t INA237_Get_Diag_Alert_Flag(INA237_Handle_TypeDef_t *hfault,INA237_Diag_A
 		return 0x99U;
 	}
 	return ((diag_alert & (1U << Ina237_Diag_Alrt)));
+}
+/**
+ * @brief  Triggers a one-shot conversion on the INA237.
+ * @details Validates the handle pointer, peripheral instance, and device address,
+ *          then writes the pre-configured trigger settings (`__reg_trigger`) to the
+ *          ADC_CONFIG register (01h) over I2C to initiate an ADC conversion cycle.
+ *
+ * @param[in] hfault Pointer to the INA237 handle structure containing device
+ *                   configuration, I2C peripheral instance, and cached trigger word.
+ *
+ * @retval HAL_OK       Trigger command successfully written over I2C.
+ * @retval HAL_ERROR    A pointer argument is NULL, the target device address is 0,
+ *                      or an I2C communication error occurred.
+ * @retval HAL_BUSY     The I2C peripheral is currently busy.
+ * @retval HAL_TIMEOUT  The I2C write operation timed out.
+ */
+HAL_StatusTypeDef INA237_Trigger_Conv(INA237_Handle_TypeDef_t *hfault)
+{
+	if(hfault == NULL ||hfault->hi2c == NULL || hfault->Init.dev_i2c_addr == 0)
+	{
+		return HAL_ERROR;
+	}
+	return INA237_WriteReg(hfault, INA237_REG_ADC_CONFIG, hfault->__reg_trigger);
 }
