@@ -103,16 +103,17 @@ int main(void)
 
   FLT_DETECT.Init.op_mode = INA237_OP_MODE_SH_BUS_TEMP_CONT;
   FLT_DETECT.Init.adc_range = INA237_ADCRANGE_163_84_MV;
-  FLT_DETECT.Init.avg = INA237_AVG_64;
+  FLT_DETECT.Init.avg = INA237_AVG_1024;
   FLT_DETECT.Init.conv_dly = 0x00U;
-  FLT_DETECT.Init.vbusct = INA237_VBUSCT_1052US;
-  FLT_DETECT.Init.vshct = INA237_VSHCT_1052US;
-  FLT_DETECT.Init.vtct = INA237_VTCT_1052US;
+  FLT_DETECT.Init.vbusct = INA237_VBUSCT_50US;
+  FLT_DETECT.Init.vshct = INA237_VSHCT_50US;
+  FLT_DETECT.Init.vtct = INA237_VTCT_50US;
   INA237_Init(&FLT_DETECT);
   FLT_DETECT.Init.max_cur_exp_A = 0.5;
   FLT_DETECT.Init.shunt_res_Ohm = 0.1;
   INA237_Set_Calib(&FLT_DETECT);
   INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_SLOWALERT, ENABLE);
+
   char c[50];
   float ff;
   uint32_t len;
@@ -148,17 +149,17 @@ int main(void)
 		  INA237_Get_Temp_C(&FLT_DETECT, &ff);
 		  len = sprintf(c,"Temp: %f\r\n",ff);
 		  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
-		  flag = INA237_Get_Diag_Alert_Flag(&FLT_DETECT, INA237_DIAG_ALRT_CNVRF);
-		  if(flag)
-		  {
-			  len = sprintf(c,"Conversion Is Complete\r\n");
-			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
-		  }
-		  else
-		  {
-			  len = sprintf(c,"False\r\n");
-			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
-		  }
+//		  flag = INA237_Get_Diag_Alert_Flag(&FLT_DETECT, INA237_DIAG_ALRT_CNVRF);
+//		  if(flag)
+//		  {
+//			  len = sprintf(c,"Conversion Is Complete\r\n");
+//			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+//		  }
+//		  else
+//		  {
+//			  len = sprintf(c,"False\r\n");
+//			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+//		  }
 	  }
   }
   /* USER CODE END 3 */
@@ -180,12 +181,11 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV6;
   RCC_OscInitStruct.PLL.PLLN = 85;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
