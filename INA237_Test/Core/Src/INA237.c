@@ -539,7 +539,7 @@ HAL_StatusTypeDef INA237_Set_Alert_Limit_Val(INA237_Handle_TypeDef_t *hfault,INA
 	{
 		return HAL_ERROR;
 	}
-	switch(Reg)
+	switch(Ina237_Reg)
 	{
 	case INA237_REG_SOVL:
 		if(Val > 0x7FFFU)
@@ -578,7 +578,7 @@ HAL_StatusTypeDef INA237_Set_Alert_Limit_Val(INA237_Handle_TypeDef_t *hfault,INA
 		return INA237_WriteReg(hfault, INA237_REG_TEMP_LIMIT, tx);
 		break;
 	case INA237_REG_PWR_LIMIT:
-		Val = Val * __INA237_POWER_LIMIT_MULTIPLIER;
+//		Val = Val * __INA237_POWER_LIMIT_MULTIPLIER; /*Multiply Power_LSB with 256 to get Power Limit LSB value*/
 		return INA237_WriteReg(hfault, INA237_REG_PWR_LIMIT, Val);
 		break;
 	default:

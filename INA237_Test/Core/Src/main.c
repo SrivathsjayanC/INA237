@@ -112,8 +112,10 @@ int main(void)
   FLT_DETECT.Init.max_cur_exp_A = 0.5;
   FLT_DETECT.Init.shunt_res_Ohm = 0.1;
   INA237_Set_Calib(&FLT_DETECT);
-  INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_SLOWALERT, ENABLE);
-
+  INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_CNVR, ENABLE);
+//  INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_SLOWALERT, ENABLE);
+  INA237_Set_Alert_Limit_Val(&FLT_DETECT, INA237_REG_TEMP_LIMIT, 0x190);
+//  INA237_Set_Diag_Alert_Config(&FLT_DETECT, _INA237_DIAG_ALRT_ALATCH, ENABLE);
   char c[50];
   float ff;
   uint32_t len;
@@ -149,17 +151,17 @@ int main(void)
 		  INA237_Get_Temp_C(&FLT_DETECT, &ff);
 		  len = sprintf(c,"Temp: %f\r\n",ff);
 		  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
-//		  flag = INA237_Get_Diag_Alert_Flag(&FLT_DETECT, INA237_DIAG_ALRT_CNVRF);
-//		  if(flag)
-//		  {
-//			  len = sprintf(c,"Conversion Is Complete\r\n");
-//			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
-//		  }
-//		  else
-//		  {
-//			  len = sprintf(c,"False\r\n");
-//			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
-//		  }
+		  flag = INA237_Get_Diag_Alert_Flag(&FLT_DETECT, INA237_DIAG_ALRT_CNVRF);
+		  if(flag & (1<<INA237_DIAG_ALRT_CNVRF))
+		  {
+			  len = sprintf(c,"True\r\n");
+			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+		  }
+		  else
+		  {
+			  len = sprintf(c,"False\r\n");
+			  HAL_UART_Transmit(&huart2,(uint8_t*)c,len, HAL_MAX_DELAY);
+		  }
 	  }
   }
   /* USER CODE END 3 */
@@ -201,13 +203,17 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }
+
+  /** Enables the Clock Security System
+  */
+  HAL_RCC_EnableCSS();
 }
 
 /**
@@ -226,7 +232,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x40B285C2;
+  hi2c1.Init.Timing = 0x10E1A6F2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
